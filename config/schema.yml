@@ -1,0 +1,26 @@
+propel:
+  _attributes:     { package: plugins.sfPropelPollsPlugin.lib.model }
+
+  sf_polls:
+    _attributes:   { phpName: sfPoll, package: plugins.sfPropelPollsPlugin.lib.model }
+    id:
+    title:         varchar(255)
+    description:   longvarchar
+    is_published:  boolean
+    created_at:
+
+  sf_polls_answers:
+    _attributes:   { phpName: sfPollAnswer, package: plugins.sfPropelPollsPlugin.lib.model }
+    id:
+    poll_id:       { type: integer, foreignTable: sf_polls, foreignReference: id, onDelete: cascade }
+    name:          varchar(255)
+    votes:         integer
+
+  sf_polls_users_answers:
+    _attributes:   { phpName: sfPollUserAnswer, package: plugins.sfPropelPollsPlugin.lib.model }
+    id:
+    poll_id:       { type: integer, foreignTable: sf_polls, foreignReference: id, onDelete: cascade }
+    answer_id:     { type: integer, foreignTable: sf_polls_answers, foreignReference: id, onDelete: cascade }
+    user_id:       { type: integer }
+    ip_address:    varchar(15)
+    created_at:
