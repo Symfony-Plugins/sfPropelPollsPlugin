@@ -3,10 +3,17 @@ sfPoll:
     title:        Do you like cats ?
     description:  The aim is to know if you like cats.
     is_published: 1
+    is_active:    1
   TestPoll2:
     title:        What is your favorite color ?
     description:  Let's see what it is !
     is_published: 1
+    is_active:    0
+  TestPoll3:
+    title:        Do you like potatoes ?
+    description:  I just want to know, for my personal knowledge.
+    is_published: 0
+    is_active:    0
     
 sfPollAnswer:
   # Poll 1
@@ -39,4 +46,16 @@ sfPollAnswer:
     poll_id:      TestPoll2
     name:         Orange
     votes:        4
-  
+  # Poll 3
+  TestPoll3Answer1:
+    poll_id:      TestPoll3
+    name:         Absolutely.
+    votes:        8
+  TestPoll3Answer2:
+    poll_id:      TestPoll3
+    name:         Yes.
+    votes:        3
+  TestPoll3Answer3:
+    poll_id:      TestPoll3
+    name:         I do.
+    votes:        4

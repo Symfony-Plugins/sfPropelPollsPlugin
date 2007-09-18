@@ -23,6 +23,14 @@ class sfPollsComponents extends sfComponents
     {
       throw new sfException('Unable to retrieve poll object');
     }
+    if (!$poll->getIsPublished())
+    {
+      throw new sfException('This poll is not published');
+    }
+    if (!$poll->getIsActive())
+    {
+      throw new sfException('Votes are closed on this poll');
+    }
     $this->poll = $poll;
   }
 

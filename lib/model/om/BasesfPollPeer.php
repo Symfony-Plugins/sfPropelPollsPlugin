@@ -13,7 +13,7 @@ abstract class BasesfPollPeer {
 	const CLASS_DEFAULT = 'plugins.sfPropelPollsPlugin.lib.model.sfPoll';
 
 	
-	const NUM_COLUMNS = 5;
+	const NUM_COLUMNS = 7;
 
 	
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -32,7 +32,13 @@ abstract class BasesfPollPeer {
 	const IS_PUBLISHED = 'sf_polls.IS_PUBLISHED';
 
 	
+	const IS_ACTIVE = 'sf_polls.IS_ACTIVE';
+
+	
 	const CREATED_AT = 'sf_polls.CREATED_AT';
+
+	
+	const UPDATED_AT = 'sf_polls.UPDATED_AT';
 
 	
 	private static $phpNameMap = null;
@@ -40,18 +46,18 @@ abstract class BasesfPollPeer {
 
 	
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'Description', 'IsPublished', 'CreatedAt', ),
-		BasePeer::TYPE_COLNAME => array (sfPollPeer::ID, sfPollPeer::TITLE, sfPollPeer::DESCRIPTION, sfPollPeer::IS_PUBLISHED, sfPollPeer::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'description', 'is_published', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'Description', 'IsPublished', 'IsActive', 'CreatedAt', 'UpdatedAt', ),
+		BasePeer::TYPE_COLNAME => array (sfPollPeer::ID, sfPollPeer::TITLE, sfPollPeer::DESCRIPTION, sfPollPeer::IS_PUBLISHED, sfPollPeer::IS_ACTIVE, sfPollPeer::CREATED_AT, sfPollPeer::UPDATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'description', 'is_published', 'is_active', 'created_at', 'updated_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'Description' => 2, 'IsPublished' => 3, 'CreatedAt' => 4, ),
-		BasePeer::TYPE_COLNAME => array (sfPollPeer::ID => 0, sfPollPeer::TITLE => 1, sfPollPeer::DESCRIPTION => 2, sfPollPeer::IS_PUBLISHED => 3, sfPollPeer::CREATED_AT => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'description' => 2, 'is_published' => 3, 'created_at' => 4, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'Description' => 2, 'IsPublished' => 3, 'IsActive' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+		BasePeer::TYPE_COLNAME => array (sfPollPeer::ID => 0, sfPollPeer::TITLE => 1, sfPollPeer::DESCRIPTION => 2, sfPollPeer::IS_PUBLISHED => 3, sfPollPeer::IS_ACTIVE => 4, sfPollPeer::CREATED_AT => 5, sfPollPeer::UPDATED_AT => 6, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'description' => 2, 'is_published' => 3, 'is_active' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	
@@ -113,7 +119,11 @@ abstract class BasesfPollPeer {
 
 		$criteria->addSelectColumn(sfPollPeer::IS_PUBLISHED);
 
+		$criteria->addSelectColumn(sfPollPeer::IS_ACTIVE);
+
 		$criteria->addSelectColumn(sfPollPeer::CREATED_AT);
+
+		$criteria->addSelectColumn(sfPollPeer::UPDATED_AT);
 
 	}
 

@@ -21,11 +21,19 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 
 
 	
-	protected $is_published;
+	protected $is_published = false;
+
+
+	
+	protected $is_active = false;
 
 
 	
 	protected $created_at;
+
+
+	
+	protected $updated_at;
 
 	
 	protected $collsfPollAnswers;
@@ -74,6 +82,13 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 	}
 
 	
+	public function getIsActive()
+	{
+
+		return $this->is_active;
+	}
+
+	
 	public function getCreatedAt($format = 'Y-m-d H:i:s')
 	{
 
@@ -85,6 +100,28 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 			}
 		} else {
 			$ts = $this->created_at;
+		}
+		if ($format === null) {
+			return $ts;
+		} elseif (strpos($format, '%') !== false) {
+			return strftime($format, $ts);
+		} else {
+			return date($format, $ts);
+		}
+	}
+
+	
+	public function getUpdatedAt($format = 'Y-m-d H:i:s')
+	{
+
+		if ($this->updated_at === null || $this->updated_at === '') {
+			return null;
+		} elseif (!is_int($this->updated_at)) {
+						$ts = strtotime($this->updated_at);
+			if ($ts === -1 || $ts === false) { 				throw new PropelException("Unable to parse value of [updated_at] as date/time value: " . var_export($this->updated_at, true));
+			}
+		} else {
+			$ts = $this->updated_at;
 		}
 		if ($format === null) {
 			return $ts;
@@ -141,9 +178,19 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 	public function setIsPublished($v)
 	{
 
-		if ($this->is_published !== $v) {
+		if ($this->is_published !== $v || $v === false) {
 			$this->is_published = $v;
 			$this->modifiedColumns[] = sfPollPeer::IS_PUBLISHED;
+		}
+
+	} 
+	
+	public function setIsActive($v)
+	{
+
+		if ($this->is_active !== $v || $v === false) {
+			$this->is_active = $v;
+			$this->modifiedColumns[] = sfPollPeer::IS_ACTIVE;
 		}
 
 	} 
@@ -165,6 +212,23 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 
 	} 
 	
+	public function setUpdatedAt($v)
+	{
+
+		if ($v !== null && !is_int($v)) {
+			$ts = strtotime($v);
+			if ($ts === -1 || $ts === false) { 				throw new PropelException("Unable to parse date/time value for [updated_at] from input: " . var_export($v, true));
+			}
+		} else {
+			$ts = $v;
+		}
+		if ($this->updated_at !== $ts) {
+			$this->updated_at = $ts;
+			$this->modifiedColumns[] = sfPollPeer::UPDATED_AT;
+		}
+
+	} 
+	
 	public function hydrate(ResultSet $rs, $startcol = 1)
 	{
 		try {
@@ -177,13 +241,17 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 
 			$this->is_published = $rs->getBoolean($startcol + 3);
 
-			$this->created_at = $rs->getTimestamp($startcol + 4, null);
+			$this->is_active = $rs->getBoolean($startcol + 4);
+
+			$this->created_at = $rs->getTimestamp($startcol + 5, null);
+
+			$this->updated_at = $rs->getTimestamp($startcol + 6, null);
 
 			$this->resetModified();
 
 			$this->setNew(false);
 
-						return $startcol + 5; 
+						return $startcol + 7; 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating sfPoll object", $e);
 		}
@@ -245,6 +313,11 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
     if ($this->isNew() && !$this->isColumnModified(sfPollPeer::CREATED_AT))
     {
       $this->setCreatedAt(time());
+    }
+
+    if ($this->isModified() && !$this->isColumnModified(sfPollPeer::UPDATED_AT))
+    {
+      $this->setUpdatedAt(time());
     }
 
 		if ($this->isDeleted()) {
@@ -393,7 +466,13 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 				return $this->getIsPublished();
 				break;
 			case 4:
+				return $this->getIsActive();
+				break;
+			case 5:
 				return $this->getCreatedAt();
+				break;
+			case 6:
+				return $this->getUpdatedAt();
 				break;
 			default:
 				return null;
@@ -409,7 +488,9 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 			$keys[1] => $this->getTitle(),
 			$keys[2] => $this->getDescription(),
 			$keys[3] => $this->getIsPublished(),
-			$keys[4] => $this->getCreatedAt(),
+			$keys[4] => $this->getIsActive(),
+			$keys[5] => $this->getCreatedAt(),
+			$keys[6] => $this->getUpdatedAt(),
 		);
 		return $result;
 	}
@@ -438,7 +519,13 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 				$this->setIsPublished($value);
 				break;
 			case 4:
+				$this->setIsActive($value);
+				break;
+			case 5:
 				$this->setCreatedAt($value);
+				break;
+			case 6:
+				$this->setUpdatedAt($value);
 				break;
 		} 	}
 
@@ -451,7 +538,9 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setDescription($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setIsPublished($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[4], $arr)) $this->setIsActive($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
 	}
 
 	
@@ -463,7 +552,9 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(sfPollPeer::TITLE)) $criteria->add(sfPollPeer::TITLE, $this->title);
 		if ($this->isColumnModified(sfPollPeer::DESCRIPTION)) $criteria->add(sfPollPeer::DESCRIPTION, $this->description);
 		if ($this->isColumnModified(sfPollPeer::IS_PUBLISHED)) $criteria->add(sfPollPeer::IS_PUBLISHED, $this->is_published);
+		if ($this->isColumnModified(sfPollPeer::IS_ACTIVE)) $criteria->add(sfPollPeer::IS_ACTIVE, $this->is_active);
 		if ($this->isColumnModified(sfPollPeer::CREATED_AT)) $criteria->add(sfPollPeer::CREATED_AT, $this->created_at);
+		if ($this->isColumnModified(sfPollPeer::UPDATED_AT)) $criteria->add(sfPollPeer::UPDATED_AT, $this->updated_at);
 
 		return $criteria;
 	}
@@ -500,7 +591,11 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 
 		$copyObj->setIsPublished($this->is_published);
 
+		$copyObj->setIsActive($this->is_active);
+
 		$copyObj->setCreatedAt($this->created_at);
+
+		$copyObj->setUpdatedAt($this->updated_at);
 
 
 		if ($deepCopy) {

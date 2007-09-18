@@ -1,13 +1,19 @@
 generator:
-  class:              sfPropelAdminGenerator
+  class:                  sfPropelAdminGenerator
   param:
-    model_class:      sfPoll
-    theme:            default
-    
+    model_class:          sfPoll
+    theme:                default
+    fields:
+      title:              { name: Title, help: "The title of the poll, usually a question" }
+      count_user_answers: { name: Number of votes }
+      is_published:       { name: Published, help: Is this poll available? }
+      is_active:          { name: Active, help: Is this poll open for voting? }
+      admin_answers:      { name: Available answers }
+        
     list:
-      title:          List of polls
-      display:        [ created_at, =title, count_user_answers ]
+      title:              List of polls
+      display:            [ created_at, =title, count_user_answers ]
       
     edit:
-      title:          Editing %%title%% poll
-      display:        [ title, description, ~admin_answers, is_published, created_at ]
+      title:              Editing %%title%% poll
+      display:            [ title, description, ~admin_answers, is_published, is_active ]
