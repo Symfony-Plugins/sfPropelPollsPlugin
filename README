@@ -1,0 +1,66 @@
+= sfPropelPollsPlugin =
+
+[[PageOutline]]
+
+sfPropelPollsPlugin is a Symfony plugin which make polling a piece of cake.
+
+= Documentation =
+
+== Installation ==
+
+To install the plugin, run this command within your symfony project :
+
+{{{
+symfony plugin-install http://plugins.symfony-project.com/sfPropelPollsPlugin
+}}}
+
+Then, rebuild your model :
+
+{{{
+symfony propel-build-all
+}}}
+
+And purge your cache :
+
+{{{
+symfony cc
+}}}
+
+== Usage ==
+
+=== API ===
+
+The API is mainly available from the {{{./lib/model/sfPoll.php}}} class object, phpdoc is quite exhaustive.
+
+=== Modules ===
+
+The plugin provide both Back and Front office standard modules that you can activate in your settings.yml.
+
+In front office, you can activate the sfPolls module :
+
+{{{
+  .settings
+    enabled_modules: [default, ..., sfPolls]
+}}}
+
+In back office, you should activate the sfPollsAdmin module :
+
+{{{
+  .settings
+    enabled_modules: [default, ..., sfPollsAdmin]
+}}}
+
+=== Components ===
+
+The plugin also provide standard component to ease polls integration. To display a polling form as a Symfony component, be sure to have activated the sfPolls module in your settings.yml as described previously and put something like this in a template :
+
+{{{
+<h2>Poll</h2>
+<?php include_component('sfPolls', 'poll_form', array('poll_id' => 1)) ?>
+}}}
+
+This will display the polling form of the sfPoll object with PK=1.
+
+== Unit testing ==
+
+The plugin is unit tested, test suite is located in the {{{./test/sfPropelPollsTest.php}}} file.

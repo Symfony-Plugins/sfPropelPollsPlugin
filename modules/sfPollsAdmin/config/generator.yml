@@ -1,0 +1,13 @@
+generator:
+  class:              sfPropelAdminGenerator
+  param:
+    model_class:      sfPoll
+    theme:            default
+    
+    list:
+      title:          List of polls
+      display:        [ created_at, =title, count_user_answers ]
+      
+    edit:
+      title:          Editing %%title%% poll
+      display:        [ title, description, ~admin_answers, is_published, created_at ]

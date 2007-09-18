@@ -1,0 +1,42 @@
+sfPoll:
+  TestPoll1:
+    title:        Do you like cats ?
+    description:  The aim is to know if you like cats.
+    is_published: 1
+  TestPoll2:
+    title:        What is your favorite color ?
+    description:  Let's see what it is !
+    is_published: 1
+    
+sfPollAnswer:
+  # Poll 1
+  TestPoll1Answer1:
+    poll_id:      TestPoll1
+    name:         "Yes"
+    votes:        2
+  TestPoll1Answer2:
+    poll_id:      TestPoll1
+    name:         "No"
+    votes:        1
+  # Poll 2
+  TestPoll2Answer1:
+    poll_id:      TestPoll2
+    name:         Red
+    votes:        4
+  TestPoll2Answer2:
+    poll_id:      TestPoll2
+    name:         Blue
+    votes:        5
+  TestPoll2Answer3:
+    poll_id:      TestPoll2
+    name:         Yellow
+    votes:        2
+  TestPoll2Answer4:
+    poll_id:      TestPoll2
+    name:         Green
+    votes:        6
+  TestPoll2Answer5:
+    poll_id:      TestPoll2
+    name:         Orange
+    votes:        4
+  
