@@ -21,15 +21,11 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 
 
 	
-	protected $votes;
+	protected $votes = 0;
 
 
 	
 	protected $created_at;
-
-
-	
-	protected $updated_at;
 
 	
 	protected $asfPoll;
@@ -97,28 +93,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 	}
 
 	
-	public function getUpdatedAt($format = 'Y-m-d H:i:s')
-	{
-
-		if ($this->updated_at === null || $this->updated_at === '') {
-			return null;
-		} elseif (!is_int($this->updated_at)) {
-						$ts = strtotime($this->updated_at);
-			if ($ts === -1 || $ts === false) { 				throw new PropelException("Unable to parse value of [updated_at] as date/time value: " . var_export($this->updated_at, true));
-			}
-		} else {
-			$ts = $this->updated_at;
-		}
-		if ($format === null) {
-			return $ts;
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $ts);
-		} else {
-			return date($format, $ts);
-		}
-	}
-
-	
 	public function setId($v)
 	{
 
@@ -172,7 +146,7 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 			$v = (int) $v;
 		}
 
-		if ($this->votes !== $v) {
+		if ($this->votes !== $v || $v === 0) {
 			$this->votes = $v;
 			$this->modifiedColumns[] = sfPollAnswerPeer::VOTES;
 		}
@@ -196,23 +170,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 
 	} 
 	
-	public function setUpdatedAt($v)
-	{
-
-		if ($v !== null && !is_int($v)) {
-			$ts = strtotime($v);
-			if ($ts === -1 || $ts === false) { 				throw new PropelException("Unable to parse date/time value for [updated_at] from input: " . var_export($v, true));
-			}
-		} else {
-			$ts = $v;
-		}
-		if ($this->updated_at !== $ts) {
-			$this->updated_at = $ts;
-			$this->modifiedColumns[] = sfPollAnswerPeer::UPDATED_AT;
-		}
-
-	} 
-	
 	public function hydrate(ResultSet $rs, $startcol = 1)
 	{
 		try {
@@ -227,13 +184,11 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 
 			$this->created_at = $rs->getTimestamp($startcol + 4, null);
 
-			$this->updated_at = $rs->getTimestamp($startcol + 5, null);
-
 			$this->resetModified();
 
 			$this->setNew(false);
 
-						return $startcol + 6; 
+						return $startcol + 5; 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating sfPollAnswer object", $e);
 		}
@@ -295,11 +250,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
     if ($this->isNew() && !$this->isColumnModified(sfPollAnswerPeer::CREATED_AT))
     {
       $this->setCreatedAt(time());
-    }
-
-    if ($this->isModified() && !$this->isColumnModified(sfPollAnswerPeer::UPDATED_AT))
-    {
-      $this->setUpdatedAt(time());
     }
 
 		if ($this->isDeleted()) {
@@ -451,9 +401,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 			case 4:
 				return $this->getCreatedAt();
 				break;
-			case 5:
-				return $this->getUpdatedAt();
-				break;
 			default:
 				return null;
 				break;
@@ -469,7 +416,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 			$keys[2] => $this->getName(),
 			$keys[3] => $this->getVotes(),
 			$keys[4] => $this->getCreatedAt(),
-			$keys[5] => $this->getUpdatedAt(),
 		);
 		return $result;
 	}
@@ -500,9 +446,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 			case 4:
 				$this->setCreatedAt($value);
 				break;
-			case 5:
-				$this->setUpdatedAt($value);
-				break;
 		} 	}
 
 	
@@ -515,7 +458,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setVotes($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
 	}
 
 	
@@ -528,7 +470,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(sfPollAnswerPeer::NAME)) $criteria->add(sfPollAnswerPeer::NAME, $this->name);
 		if ($this->isColumnModified(sfPollAnswerPeer::VOTES)) $criteria->add(sfPollAnswerPeer::VOTES, $this->votes);
 		if ($this->isColumnModified(sfPollAnswerPeer::CREATED_AT)) $criteria->add(sfPollAnswerPeer::CREATED_AT, $this->created_at);
-		if ($this->isColumnModified(sfPollAnswerPeer::UPDATED_AT)) $criteria->add(sfPollAnswerPeer::UPDATED_AT, $this->updated_at);
 
 		return $criteria;
 	}
@@ -566,8 +507,6 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 		$copyObj->setVotes($this->votes);
 
 		$copyObj->setCreatedAt($this->created_at);
-
-		$copyObj->setUpdatedAt($this->updated_at);
 
 
 		if ($deepCopy) {
@@ -730,6 +669,41 @@ abstract class BasesfPollAnswer extends BaseObject  implements Persistent {
 
 			if (!isset($this->lastsfPollUserAnswerCriteria) || !$this->lastsfPollUserAnswerCriteria->equals($criteria)) {
 				$this->collsfPollUserAnswers = sfPollUserAnswerPeer::doSelectJoinsfPoll($criteria, $con);
+			}
+		}
+		$this->lastsfPollUserAnswerCriteria = $criteria;
+
+		return $this->collsfPollUserAnswers;
+	}
+
+
+	
+	public function getsfPollUserAnswersJoinMember($criteria = null, $con = null)
+	{
+				include_once 'plugins/sfPropelPollsPlugin/lib/model/om/BasesfPollUserAnswerPeer.php';
+		if ($criteria === null) {
+			$criteria = new Criteria();
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collsfPollUserAnswers === null) {
+			if ($this->isNew()) {
+				$this->collsfPollUserAnswers = array();
+			} else {
+
+				$criteria->add(sfPollUserAnswerPeer::ANSWER_ID, $this->getId());
+
+				$this->collsfPollUserAnswers = sfPollUserAnswerPeer::doSelectJoinMember($criteria, $con);
+			}
+		} else {
+									
+			$criteria->add(sfPollUserAnswerPeer::ANSWER_ID, $this->getId());
+
+			if (!isset($this->lastsfPollUserAnswerCriteria) || !$this->lastsfPollUserAnswerCriteria->equals($criteria)) {
+				$this->collsfPollUserAnswers = sfPollUserAnswerPeer::doSelectJoinMember($criteria, $con);
 			}
 		}
 		$this->lastsfPollUserAnswerCriteria = $criteria;

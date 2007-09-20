@@ -14,27 +14,86 @@ To install the plugin, run this command within your symfony project :
 symfony plugin-install http://plugins.symfony-project.com/sfPropelPollsPlugin
 }}}
 
+Copy the sample configuration file from 
+{{{myproject/plugins/sfPropelPollsPlugin/config/sfPropelPollsPlugin.yml.sample}}} 
+into yout project's (not application!) {{{config/}}} folder. Rename it to 
+{{{myproject/config/sfPropelPollsPlugin.yml}}}. If you want to specify the name 
+of the existing user table and class, edit this file (see [#PluginConfiguration 
+next section about the plugin configuration] for further details).
+
+If you use symfony 1.0, you must manually register a config handler for this 
+configuration file by creating a {{{config_handlers.yml}}} file in your 
+application {{{config/}}} directory with the following content:
+
+{{{
+config/sfPropelPollsPlugin.yml:
+  class:    sfPropelPollsConfigHandler
+  param:
+    prefix: sf_propel_polls_
+}}}
+
+This last step '''is not required if you use symfony 1.1'''.
+
 Then, rebuild your model :
 
 {{{
 symfony propel-build-all
 }}}
 
-And purge your cache :
+Now, as a pure Symfony tradition, purge your cache :
 
 {{{
 symfony cc
 }}}
 
+=== Plugin configuration ===
+
+==== The {{{sfPropelPollsPlugin.yml}}} file ====
+
+The plugin schema is configurable to match your database table names. Here is 
+the default plugin configuration, taken from 
+{{{myproject/plugins/sfSimpleBlogPlugin/config/sfPropelPollsPlugin.yml.sample}}}:
+
+{{{
+schema:
+  connection:                propel                 # database connection you want to use (related to the databases.yml configuration)
+  user_table:                sf_guard_user          # user table name
+  user_id:                   id                     # primary key of the user table
+  user_class:                sfGuardUser            # name of the Propel object for users
+  polls_table:               sf_polls               # polls table name
+  polls_answers_table:       sf_polls_answers       # polls answers table name
+  polls_users_answers_table: sf_polls_users_answers # polls votes table name
+}}}
+
+You can customize these settings in {{{myproject/config/sfPropelPollsPlugin.yml}}}.
+
+'''Note:''' After modifying the schema settings, you must rebuild your model. 
+
+=== The {{{app.yml}}} file ===
+
+=== SVN repository ===
+
+The plugin is also available through the Symfony SVN repository.
+
+Stable version are available in the 
+{{{[http://svn.symfony-project.com/plugins/sfPropelPollsPlugin/tags tags]}}} 
+folder, experimental ones in the 
+{{{[http://svn.symfony-project.com/plugins/sfPropelPollsPlugin/branches branches]}}} 
+one and the current alpha in the {{{[http://svn.symfony-project.com/plugins/sfPropelPollsPlugin/trunk trunk]}}}.
+
+'''Caution:''' Never use the trunk version in a production environment.
+
 == Usage ==
 
 === API ===
 
-The API is mainly available from the {{{./lib/model/sfPoll.php}}} class object, phpdoc is quite exhaustive.
+The API is mainly available from the {{{./lib/model/sfPoll.php}}} class object, 
+phpdoc is quite exhaustive.
 
 === Modules ===
 
-The plugin provide both Back and Front office standard modules that you can activate in your settings.yml.
+The plugin provide both Back and Front office standard modules that you can 
+activate in the {{{settings.yml}}} of your apps.
 
 In front office, you can activate the sfPolls module :
 
@@ -50,9 +109,31 @@ In back office, you should activate the sfPollsAdmin module :
     enabled_modules: [default, ..., sfPollsAdmin]
 }}}
 
+Front office routes url are provided by default, here they are:
+
+ * {{{polls}}}: lists all published polls
+ * {{{poll_detail?id=id}}}: shows poll form
+ * {{{poll_results?id=id}}}: shows poll results
+ * {{{poll_vote}}}: handle voting request
+ 
+If you wish to deactivate these routes, you can set this setting in the 
+{{{app.yml}}} of your app:
+
+{{{
+all:
+  sfPropelPollsPlugin:
+    routes_register:    false
+}}}
+
+Note that you'll have to specify corresponding routes in your {{{routing.yml}}} 
+file for the plugin to work.
+
 === Components ===
 
-The plugin also provide standard component to ease polls integration. To display a polling form as a Symfony component, be sure to have activated the sfPolls module in your settings.yml as described previously and put something like this in a template :
+The plugin also provide standard component to ease polls integration. To display 
+a polling form as a Symfony component, be sure to have activated the sfPolls 
+module in your settings.yml as described previously and put something like this 
+in a template :
 
 {{{
 <h2>Poll</h2>
@@ -63,4 +144,6 @@ This will display the polling form of the sfPoll object with PK=1.
 
 == Unit testing ==
 
-The plugin is unit tested, test suite is located in the {{{./test/sfPropelPollsTest.php}}} file.
+The plugin is unit tested, test suite is located in the 
+{{{./test/sfPropelPollsTest.php}}} file.
+

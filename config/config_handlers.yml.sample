@@ -1,0 +1,4 @@
+config/sfPropelPollsPlugin.yml:
+  class:    sfPropelPollsConfigHandler
+  param:
+    prefix: sf_propel_polls_

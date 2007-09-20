@@ -12,13 +12,13 @@ class sfPoll extends BasesfPoll
    *
    * @param  string  $answer_text
    * @return sfPollAnswer
-   * @throws PropelException
+   * @throws sfPropelPollsException
    **/
   public function addAnswer($answer_text)
   {
     if ($this->isNew() or is_null($this->getId()))
     {
-      throw new PropelException('You cannot add an answer to an unsaved poll');
+      throw new sfPropelPollsException('You cannot add an answer to an unsaved poll');
     }
     $answer = sfPollAnswerPeer::getOrCreate($this->getId(), $answer_text);
     $answer->setsfPoll($this);
@@ -26,52 +26,116 @@ class sfPoll extends BasesfPoll
     $answer->save();
     return $answer;
   }
-
+  
   /**
-   * Add a sfPollUserAnswer object related to current sfPoll object instance
+   * Add sfPollAnswer objects related to current sfPoll object instance from 
+   * an array of answer text strings
    *
-   * @param  int     $user_id     Typically an integer representing a User PK
-   * @param  int     $answer_id   sfPollAnswer PK
-   * @param  string  $ip_address  IP address (optionnal)
-   * @return sfPollUserAnswer
-   * @throws PropelException
+   * @param  array  $answers
+   * @throws sfPropelPollsException
    **/
-  public function addUserAnswer($user_id, $answer_id, $ip_address=NULL)
+  public function addAnswers($answers)
   {
     if ($this->isNew() or is_null($this->getId()))
     {
-      throw new PropelException('You cannot add a user answer to an unsaved poll');
+      throw new sfPropelPollsException('You cannot add an answer to an unsaved poll');
+    }
+    foreach ($answers as $answer_text)
+    {
+      $this->addAnswer(trim($answer_text));
+    }
+  }
+
+  /**
+   * Add a sfPollUserAnswer object related to current sfPoll object instance
+   * 
+   * @param  int     $answer_id   sfPollAnswer PK
+   * @param  int     $user_id     User PK (optional)
+   * @throws sfPropelPollsException
+   **/
+  public function addVote($answer_id, $user_id = null)
+  {
+    if ($this->isNew() or is_null($this->getId()))
+    {
+      throw new sfPropelPollsException('You cannot add a user answer to an unsaved poll');
+    }
+    
+    if ($this->getIsPublished() !== true)
+    {
+      throw new sfPropelPollsException('This poll is not currently published');
+    }
+    
+    if ($this->getIsActive() !== true)
+    {
+      throw new sfPropelPollsException('Votes on this poll are closed');
     }
 
     $answer = sfPollAnswerPeer::retrieveByPK($answer_id);
     if (!$answer)
     {
-      throw new PropelException('Unable to retrieve answer associated to poll');
+      throw new sfPropelPollsException('Unable to retrieve answer associated to poll');
     }
 
     if ($answer->getPollId() !== $this->getId())
     {
-      throw new PropelException('The answer provided is not associated with current poll');
+      throw new sfPropelPollsException('The answer provided is not associated with current poll');
     }
 
-    # Checks if user has already voted
-    $user_answer = sfPollUserAnswerPeer::getOrCreate($this->getId(), $user_id, $ip_address);
-    $user_answer->setPollId($this->getId());
-    $user_answer->setAnswerId($answer_id);
-    $user_answer->setUserId($user_id);
-    $user_answer->setIpAddress($ip_address);
-    $user_answer->save();
-    return $user_answer;
+    if (!is_null($user_id))
+    {
+      if ($this->hasUserVoted($user_id))
+      {
+        throw new sfPropelPollsException('User has already voted for this poll');
+      }
+      else
+      {
+        $user_answer = new sfPollUserAnswer();
+        $user_answer->setPollId($this->getId());
+        $user_answer->setAnswerId($answer_id);
+        $user_answer->setUserId($user_id);
+        $user_answer->save();
+        $answer->incrementVotesCount();
+      }
+    }
+    else
+    {
+      // We apply the vote without any check in db
+      // I guess you'll use a cookie in your controller to avoid cheating
+      $answer->incrementVotesCount();
+    }
   }
 
   /**
-   * Proxy method for countsfPollUserAnswers to use through admin generator
+   * Retrieves total number of votes
    *
    * @return int
+   * @throws sfPropelPollsException
    **/
-  public function getCountUserAnswers()
+  public function getCountVotes()
   {
-    return $this->countsfPollUserAnswers();
+    $answers = $this->getAnswers();
+    if (is_null($answers) or count($answers) === 0)
+    {
+      throw new sfPropelPollsException('This poll has no answers');
+    }
+    $count_votes = 0;
+    foreach ($answers as $answer)
+    {
+      $count_votes += $answer->getVotes();
+    }
+    return $count_votes;
+  }
+  
+  /**
+   * Retrieves poll answers
+   * 
+   * @return array of sfPollAnswer objects
+   */
+  public function getAnswers()
+  {
+    $c = new Criteria();
+    $c->add(sfPollAnswerPeer::POLL_ID, $this->getId());
+    return sfPollAnswerPeer::doSelect($c);
   }
 
   /**
@@ -81,7 +145,7 @@ class sfPoll extends BasesfPoll
    **/
   public function getPossibleAnswers()
   {
-    $answers = $this->getsfPollAnswers();
+    $answers = $this->getAnswers();
     $results = array();
     foreach ($answers as $answer)
     {
@@ -97,63 +161,55 @@ class sfPoll extends BasesfPoll
    **/
   public function getResults()
   {
-    $c = new Criteria();
-    $c->add(sfPollAnswerPeer::POLL_ID, $this->getId());
-    $c->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
-    $c->clearSelectColumns();
-    $c->addSelectColumn(sfPollAnswerPeer::ID);
-    $c->addSelectColumn(sfPollAnswerPeer::NAME);
-    $c->addAsColumn('count_votes', 'COUNT('.sfPollUserAnswerPeer::ID.')');
-    $c->addAsColumn('total_votes', '(SELECT COUNT('.sfPollUserAnswerPeer::ID.') FROM '.sfPollUserAnswerPeer::TABLE_NAME.' WHERE '.sfPollUserAnswerPeer::POLL_ID.'='.$this->getId().')');
-    $c->addGroupByColumn(sfPollUserAnswerPeer::ANSWER_ID);
-    $rs = sfPollAnswerPeer::doSelectRS($c);
     $results = array();
-    while ($rs->next())
+    $total = $this->getCountVotes();
+    foreach ($this->getAnswers() as $answer)
     {
-      $count   = $rs->getString(3);
-      $total   = $rs->getString(4);
-      if (!$total)
-      {
-        break; // Avoid division by zero
-      }
-      $id = $rs->getString(1);
-      $percent = $count * 100 / $total;
-      $results[$id] = array('name'    => $rs->getString(2),
-                            'count'   => $count,
-                            'percent' => $percent);
-    }
-    foreach ($this->getsfPollAnswers() as $answer)
-    {
-      if (!array_key_exists($answer->getId(), $results))
-      {
-        $results[$answer->getId()] = array('name'    => $answer->getName(),
-                                           'count'   => 0,
-                                           'percent' => 0);
-      }
+      $votes = $answer->getVotes();
+      $percent = $total > 0 ? $votes * 100 / $total : 0;
+      $results[$answer->getId()] = array('name'    => $answer->getName(),
+                                         'count'   => $votes,
+                                         'percent' => $percent);
     }
     return $results;
   }
-
+  
   /**
-   * Get the answer provided by an user from its PK or IP address
-   *
-   * @param  int     $user_id
-   * @param  string  $ip_address (optional)
-   * @return sfPollUserAnswer or NULL
-   **/
-  public function getUserAnswer($user_id, $ip_address=NULL)
+   * Retrieves user answer from a user PK
+   * 
+   * @param  int  $user_id  User PK
+   * @return sfPollAnswer
+   */  
+  public function getUserAnswer($user_id=null)
   {
+    if (is_null($user_id))
+    {
+      return null;
+    }
     $c = new Criteria();
-    if ($ip_address)
-    {
-      $c->add(sfPollUserAnswerPeer::IP_ADDRESS, $ip_address);
-    }
-    else
-    {
-      $c->add(sfPollUserAnswerPeer::USER_ID, $user_id);
-    }
+    $c->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
+    $c->add(sfPollUserAnswerPeer::USER_ID, $user_id);
     $c->add(sfPollUserAnswerPeer::POLL_ID, $this->getId());
-    return sfPollUserAnswerPeer::doSelectOne($c);
+    return sfPollAnswerPeer::doSelectOne($c);
   }
-
+  
+  /**
+   * Checks if a user has already voted
+   * 
+   * @param  int  $user_id
+   * @return boolean
+   * @throws sfPropelPollsException
+   */
+  public function hasUserVoted($user_id=null)
+  {
+    if (is_null($user_id))
+    {
+      return false;
+    }
+    $c = new Criteria();
+    $c->add(sfPollUserAnswerPeer::POLL_ID, $this->getId());
+    $c->add(sfPollUserAnswerPeer::USER_ID, $user_id);
+    return (sfPollUserAnswerPeer::doCount($c) > 0);
+  }
+  
 }

@@ -38,9 +38,7 @@ class sfPollUserAnswerMapBuilder {
 
 		$tMap->addForeignKey('ANSWER_ID', 'AnswerId', 'int', CreoleTypes::INTEGER, 'sf_polls_answers', 'ID', false, null);
 
-		$tMap->addColumn('USER_ID', 'UserId', 'int', CreoleTypes::INTEGER, false, null);
-
-		$tMap->addColumn('IP_ADDRESS', 'IpAddress', 'string', CreoleTypes::VARCHAR, false, 15);
+		$tMap->addForeignKey('USER_ID', 'UserId', 'int', CreoleTypes::INTEGER, 'member', 'ID', false, null);
 
 		$tMap->addColumn('CREATED_AT', 'CreatedAt', 'int', CreoleTypes::TIMESTAMP, false, null);
 

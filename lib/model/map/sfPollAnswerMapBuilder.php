@@ -38,11 +38,9 @@ class sfPollAnswerMapBuilder {
 
 		$tMap->addColumn('NAME', 'Name', 'string', CreoleTypes::VARCHAR, true, 255);
 
-		$tMap->addColumn('VOTES', 'Votes', 'int', CreoleTypes::INTEGER, false, null);
+		$tMap->addColumn('VOTES', 'Votes', 'int', CreoleTypes::INTEGER, true, null);
 
 		$tMap->addColumn('CREATED_AT', 'CreatedAt', 'int', CreoleTypes::TIMESTAMP, false, null);
-
-		$tMap->addColumn('UPDATED_AT', 'UpdatedAt', 'int', CreoleTypes::TIMESTAMP, false, null);
 
 	} 
 } 

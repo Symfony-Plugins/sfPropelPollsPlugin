@@ -810,6 +810,41 @@ abstract class BasesfPoll extends BaseObject  implements Persistent {
 	}
 
 
+	
+	public function getsfPollUserAnswersJoinMember($criteria = null, $con = null)
+	{
+				include_once 'plugins/sfPropelPollsPlugin/lib/model/om/BasesfPollUserAnswerPeer.php';
+		if ($criteria === null) {
+			$criteria = new Criteria();
+		}
+		elseif ($criteria instanceof Criteria)
+		{
+			$criteria = clone $criteria;
+		}
+
+		if ($this->collsfPollUserAnswers === null) {
+			if ($this->isNew()) {
+				$this->collsfPollUserAnswers = array();
+			} else {
+
+				$criteria->add(sfPollUserAnswerPeer::POLL_ID, $this->getId());
+
+				$this->collsfPollUserAnswers = sfPollUserAnswerPeer::doSelectJoinMember($criteria, $con);
+			}
+		} else {
+									
+			$criteria->add(sfPollUserAnswerPeer::POLL_ID, $this->getId());
+
+			if (!isset($this->lastsfPollUserAnswerCriteria) || !$this->lastsfPollUserAnswerCriteria->equals($criteria)) {
+				$this->collsfPollUserAnswers = sfPollUserAnswerPeer::doSelectJoinMember($criteria, $con);
+			}
+		}
+		$this->lastsfPollUserAnswerCriteria = $criteria;
+
+		return $this->collsfPollUserAnswers;
+	}
+
+
   public function __call($method, $arguments)
   {
     if (!$callable = sfMixer::getCallable('BasesfPoll:'.$method))

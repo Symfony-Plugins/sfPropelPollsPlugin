@@ -13,7 +13,7 @@ abstract class BasesfPollUserAnswerPeer {
 	const CLASS_DEFAULT = 'plugins.sfPropelPollsPlugin.lib.model.sfPollUserAnswer';
 
 	
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 5;
 
 	
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -32,9 +32,6 @@ abstract class BasesfPollUserAnswerPeer {
 	const USER_ID = 'sf_polls_users_answers.USER_ID';
 
 	
-	const IP_ADDRESS = 'sf_polls_users_answers.IP_ADDRESS';
-
-	
 	const CREATED_AT = 'sf_polls_users_answers.CREATED_AT';
 
 	
@@ -43,18 +40,18 @@ abstract class BasesfPollUserAnswerPeer {
 
 	
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PollId', 'AnswerId', 'UserId', 'IpAddress', 'CreatedAt', ),
-		BasePeer::TYPE_COLNAME => array (sfPollUserAnswerPeer::ID, sfPollUserAnswerPeer::POLL_ID, sfPollUserAnswerPeer::ANSWER_ID, sfPollUserAnswerPeer::USER_ID, sfPollUserAnswerPeer::IP_ADDRESS, sfPollUserAnswerPeer::CREATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'poll_id', 'answer_id', 'user_id', 'ip_address', 'created_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PollId', 'AnswerId', 'UserId', 'CreatedAt', ),
+		BasePeer::TYPE_COLNAME => array (sfPollUserAnswerPeer::ID, sfPollUserAnswerPeer::POLL_ID, sfPollUserAnswerPeer::ANSWER_ID, sfPollUserAnswerPeer::USER_ID, sfPollUserAnswerPeer::CREATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'poll_id', 'answer_id', 'user_id', 'created_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PollId' => 1, 'AnswerId' => 2, 'UserId' => 3, 'IpAddress' => 4, 'CreatedAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (sfPollUserAnswerPeer::ID => 0, sfPollUserAnswerPeer::POLL_ID => 1, sfPollUserAnswerPeer::ANSWER_ID => 2, sfPollUserAnswerPeer::USER_ID => 3, sfPollUserAnswerPeer::IP_ADDRESS => 4, sfPollUserAnswerPeer::CREATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'poll_id' => 1, 'answer_id' => 2, 'user_id' => 3, 'ip_address' => 4, 'created_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PollId' => 1, 'AnswerId' => 2, 'UserId' => 3, 'CreatedAt' => 4, ),
+		BasePeer::TYPE_COLNAME => array (sfPollUserAnswerPeer::ID => 0, sfPollUserAnswerPeer::POLL_ID => 1, sfPollUserAnswerPeer::ANSWER_ID => 2, sfPollUserAnswerPeer::USER_ID => 3, sfPollUserAnswerPeer::CREATED_AT => 4, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'poll_id' => 1, 'answer_id' => 2, 'user_id' => 3, 'created_at' => 4, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	
@@ -115,8 +112,6 @@ abstract class BasesfPollUserAnswerPeer {
 		$criteria->addSelectColumn(sfPollUserAnswerPeer::ANSWER_ID);
 
 		$criteria->addSelectColumn(sfPollUserAnswerPeer::USER_ID);
-
-		$criteria->addSelectColumn(sfPollUserAnswerPeer::IP_ADDRESS);
 
 		$criteria->addSelectColumn(sfPollUserAnswerPeer::CREATED_AT);
 
@@ -262,6 +257,34 @@ abstract class BasesfPollUserAnswerPeer {
 
 
 	
+	public static function doCountJoinMember(Criteria $criteria, $distinct = false, $con = null)
+	{
+				$criteria = clone $criteria;
+
+				$criteria->clearSelectColumns()->clearOrderByColumns();
+		if ($distinct || in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+			$criteria->addSelectColumn(sfPollUserAnswerPeer::COUNT_DISTINCT);
+		} else {
+			$criteria->addSelectColumn(sfPollUserAnswerPeer::COUNT);
+		}
+
+				foreach($criteria->getGroupByColumns() as $column)
+		{
+			$criteria->addSelectColumn($column);
+		}
+
+		$criteria->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
+
+		$rs = sfPollUserAnswerPeer::doSelectRS($criteria, $con);
+		if ($rs->next()) {
+			return $rs->getInt(1);
+		} else {
+						return 0;
+		}
+	}
+
+
+	
 	public static function doSelectJoinsfPoll(Criteria $c, $con = null)
 	{
 		$c = clone $c;
@@ -356,6 +379,53 @@ abstract class BasesfPollUserAnswerPeer {
 
 
 	
+	public static function doSelectJoinMember(Criteria $c, $con = null)
+	{
+		$c = clone $c;
+
+				if ($c->getDbName() == Propel::getDefaultDB()) {
+			$c->setDbName(self::DATABASE_NAME);
+		}
+
+		sfPollUserAnswerPeer::addSelectColumns($c);
+		$startcol = (sfPollUserAnswerPeer::NUM_COLUMNS - sfPollUserAnswerPeer::NUM_LAZY_LOAD_COLUMNS) + 1;
+		MemberPeer::addSelectColumns($c);
+
+		$c->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
+		$rs = BasePeer::doSelect($c, $con);
+		$results = array();
+
+		while($rs->next()) {
+
+			$omClass = sfPollUserAnswerPeer::getOMClass();
+
+			$cls = Propel::import($omClass);
+			$obj1 = new $cls();
+			$obj1->hydrate($rs);
+
+			$omClass = MemberPeer::getOMClass();
+
+			$cls = Propel::import($omClass);
+			$obj2 = new $cls();
+			$obj2->hydrate($rs, $startcol);
+
+			$newObject = true;
+			foreach($results as $temp_obj1) {
+				$temp_obj2 = $temp_obj1->getMember(); 				if ($temp_obj2->getPrimaryKey() === $obj2->getPrimaryKey()) {
+					$newObject = false;
+										$temp_obj2->addsfPollUserAnswer($obj1); 					break;
+				}
+			}
+			if ($newObject) {
+				$obj2->initsfPollUserAnswers();
+				$obj2->addsfPollUserAnswer($obj1); 			}
+			$results[] = $obj1;
+		}
+		return $results;
+	}
+
+
+	
 	public static function doCountJoinAll(Criteria $criteria, $distinct = false, $con = null)
 	{
 		$criteria = clone $criteria;
@@ -375,6 +445,8 @@ abstract class BasesfPollUserAnswerPeer {
 		$criteria->addJoin(sfPollUserAnswerPeer::POLL_ID, sfPollPeer::ID);
 
 		$criteria->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
+
+		$criteria->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
 
 		$rs = sfPollUserAnswerPeer::doSelectRS($criteria, $con);
 		if ($rs->next()) {
@@ -403,9 +475,14 @@ abstract class BasesfPollUserAnswerPeer {
 		sfPollAnswerPeer::addSelectColumns($c);
 		$startcol4 = $startcol3 + sfPollAnswerPeer::NUM_COLUMNS;
 
+		MemberPeer::addSelectColumns($c);
+		$startcol5 = $startcol4 + MemberPeer::NUM_COLUMNS;
+
 		$c->addJoin(sfPollUserAnswerPeer::POLL_ID, sfPollPeer::ID);
 
 		$c->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
+
+		$c->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
 
 		$rs = BasePeer::doSelect($c, $con);
 		$results = array();
@@ -465,6 +542,29 @@ abstract class BasesfPollUserAnswerPeer {
 				$obj3->addsfPollUserAnswer($obj1);
 			}
 
+
+					
+			$omClass = MemberPeer::getOMClass();
+
+
+			$cls = Propel::import($omClass);
+			$obj4 = new $cls();
+			$obj4->hydrate($rs, $startcol4);
+
+			$newObject = true;
+			for ($j=0, $resCount=count($results); $j < $resCount; $j++) {
+				$temp_obj1 = $results[$j];
+				$temp_obj4 = $temp_obj1->getMember(); 				if ($temp_obj4->getPrimaryKey() === $obj4->getPrimaryKey()) {
+					$newObject = false;
+					$temp_obj4->addsfPollUserAnswer($obj1); 					break;
+				}
+			}
+
+			if ($newObject) {
+				$obj4->initsfPollUserAnswers();
+				$obj4->addsfPollUserAnswer($obj1);
+			}
+
 			$results[] = $obj1;
 		}
 		return $results;
@@ -489,6 +589,8 @@ abstract class BasesfPollUserAnswerPeer {
 		}
 
 		$criteria->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
+
+		$criteria->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
 
 		$rs = sfPollUserAnswerPeer::doSelectRS($criteria, $con);
 		if ($rs->next()) {
@@ -518,6 +620,38 @@ abstract class BasesfPollUserAnswerPeer {
 
 		$criteria->addJoin(sfPollUserAnswerPeer::POLL_ID, sfPollPeer::ID);
 
+		$criteria->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
+
+		$rs = sfPollUserAnswerPeer::doSelectRS($criteria, $con);
+		if ($rs->next()) {
+			return $rs->getInt(1);
+		} else {
+						return 0;
+		}
+	}
+
+
+	
+	public static function doCountJoinAllExceptMember(Criteria $criteria, $distinct = false, $con = null)
+	{
+				$criteria = clone $criteria;
+
+				$criteria->clearSelectColumns()->clearOrderByColumns();
+		if ($distinct || in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+			$criteria->addSelectColumn(sfPollUserAnswerPeer::COUNT_DISTINCT);
+		} else {
+			$criteria->addSelectColumn(sfPollUserAnswerPeer::COUNT);
+		}
+
+				foreach($criteria->getGroupByColumns() as $column)
+		{
+			$criteria->addSelectColumn($column);
+		}
+
+		$criteria->addJoin(sfPollUserAnswerPeer::POLL_ID, sfPollPeer::ID);
+
+		$criteria->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
+
 		$rs = sfPollUserAnswerPeer::doSelectRS($criteria, $con);
 		if ($rs->next()) {
 			return $rs->getInt(1);
@@ -542,7 +676,12 @@ abstract class BasesfPollUserAnswerPeer {
 		sfPollAnswerPeer::addSelectColumns($c);
 		$startcol3 = $startcol2 + sfPollAnswerPeer::NUM_COLUMNS;
 
+		MemberPeer::addSelectColumns($c);
+		$startcol4 = $startcol3 + MemberPeer::NUM_COLUMNS;
+
 		$c->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
+
+		$c->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
 
 
 		$rs = BasePeer::doSelect($c, $con);
@@ -578,6 +717,28 @@ abstract class BasesfPollUserAnswerPeer {
 				$obj2->addsfPollUserAnswer($obj1);
 			}
 
+			$omClass = MemberPeer::getOMClass();
+
+
+			$cls = Propel::import($omClass);
+			$obj3  = new $cls();
+			$obj3->hydrate($rs, $startcol3);
+
+			$newObject = true;
+			for ($j=0, $resCount=count($results); $j < $resCount; $j++) {
+				$temp_obj1 = $results[$j];
+				$temp_obj3 = $temp_obj1->getMember(); 				if ($temp_obj3->getPrimaryKey() === $obj3->getPrimaryKey()) {
+					$newObject = false;
+					$temp_obj3->addsfPollUserAnswer($obj1);
+					break;
+				}
+			}
+
+			if ($newObject) {
+				$obj3->initsfPollUserAnswers();
+				$obj3->addsfPollUserAnswer($obj1);
+			}
+
 			$results[] = $obj1;
 		}
 		return $results;
@@ -599,7 +760,12 @@ abstract class BasesfPollUserAnswerPeer {
 		sfPollPeer::addSelectColumns($c);
 		$startcol3 = $startcol2 + sfPollPeer::NUM_COLUMNS;
 
+		MemberPeer::addSelectColumns($c);
+		$startcol4 = $startcol3 + MemberPeer::NUM_COLUMNS;
+
 		$c->addJoin(sfPollUserAnswerPeer::POLL_ID, sfPollPeer::ID);
+
+		$c->addJoin(sfPollUserAnswerPeer::USER_ID, MemberPeer::ID);
 
 
 		$rs = BasePeer::doSelect($c, $con);
@@ -633,6 +799,112 @@ abstract class BasesfPollUserAnswerPeer {
 			if ($newObject) {
 				$obj2->initsfPollUserAnswers();
 				$obj2->addsfPollUserAnswer($obj1);
+			}
+
+			$omClass = MemberPeer::getOMClass();
+
+
+			$cls = Propel::import($omClass);
+			$obj3  = new $cls();
+			$obj3->hydrate($rs, $startcol3);
+
+			$newObject = true;
+			for ($j=0, $resCount=count($results); $j < $resCount; $j++) {
+				$temp_obj1 = $results[$j];
+				$temp_obj3 = $temp_obj1->getMember(); 				if ($temp_obj3->getPrimaryKey() === $obj3->getPrimaryKey()) {
+					$newObject = false;
+					$temp_obj3->addsfPollUserAnswer($obj1);
+					break;
+				}
+			}
+
+			if ($newObject) {
+				$obj3->initsfPollUserAnswers();
+				$obj3->addsfPollUserAnswer($obj1);
+			}
+
+			$results[] = $obj1;
+		}
+		return $results;
+	}
+
+
+	
+	public static function doSelectJoinAllExceptMember(Criteria $c, $con = null)
+	{
+		$c = clone $c;
+
+								if ($c->getDbName() == Propel::getDefaultDB()) {
+			$c->setDbName(self::DATABASE_NAME);
+		}
+
+		sfPollUserAnswerPeer::addSelectColumns($c);
+		$startcol2 = (sfPollUserAnswerPeer::NUM_COLUMNS - sfPollUserAnswerPeer::NUM_LAZY_LOAD_COLUMNS) + 1;
+
+		sfPollPeer::addSelectColumns($c);
+		$startcol3 = $startcol2 + sfPollPeer::NUM_COLUMNS;
+
+		sfPollAnswerPeer::addSelectColumns($c);
+		$startcol4 = $startcol3 + sfPollAnswerPeer::NUM_COLUMNS;
+
+		$c->addJoin(sfPollUserAnswerPeer::POLL_ID, sfPollPeer::ID);
+
+		$c->addJoin(sfPollUserAnswerPeer::ANSWER_ID, sfPollAnswerPeer::ID);
+
+
+		$rs = BasePeer::doSelect($c, $con);
+		$results = array();
+
+		while($rs->next()) {
+
+			$omClass = sfPollUserAnswerPeer::getOMClass();
+
+			$cls = Propel::import($omClass);
+			$obj1 = new $cls();
+			$obj1->hydrate($rs);
+
+			$omClass = sfPollPeer::getOMClass();
+
+
+			$cls = Propel::import($omClass);
+			$obj2  = new $cls();
+			$obj2->hydrate($rs, $startcol2);
+
+			$newObject = true;
+			for ($j=0, $resCount=count($results); $j < $resCount; $j++) {
+				$temp_obj1 = $results[$j];
+				$temp_obj2 = $temp_obj1->getsfPoll(); 				if ($temp_obj2->getPrimaryKey() === $obj2->getPrimaryKey()) {
+					$newObject = false;
+					$temp_obj2->addsfPollUserAnswer($obj1);
+					break;
+				}
+			}
+
+			if ($newObject) {
+				$obj2->initsfPollUserAnswers();
+				$obj2->addsfPollUserAnswer($obj1);
+			}
+
+			$omClass = sfPollAnswerPeer::getOMClass();
+
+
+			$cls = Propel::import($omClass);
+			$obj3  = new $cls();
+			$obj3->hydrate($rs, $startcol3);
+
+			$newObject = true;
+			for ($j=0, $resCount=count($results); $j < $resCount; $j++) {
+				$temp_obj1 = $results[$j];
+				$temp_obj3 = $temp_obj1->getsfPollAnswer(); 				if ($temp_obj3->getPrimaryKey() === $obj3->getPrimaryKey()) {
+					$newObject = false;
+					$temp_obj3->addsfPollUserAnswer($obj1);
+					break;
+				}
+			}
+
+			if ($newObject) {
+				$obj3->initsfPollUserAnswers();
+				$obj3->addsfPollUserAnswer($obj1);
 			}
 
 			$results[] = $obj1;

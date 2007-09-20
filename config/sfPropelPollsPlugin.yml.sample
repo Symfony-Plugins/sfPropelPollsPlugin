@@ -1,0 +1,8 @@
+schema:
+  connection:                propel
+  user_table:                sf_guard_users
+  user_id:                   id
+  user_class:                sfGuardUser
+  polls_table:               sf_polls
+  polls_answers_table:       sf_polls_answers
+  polls_users_answers_table: sf_polls_users_answers

@@ -2,6 +2,8 @@
 /**
  * sfPropelPollsPlugin components
  * 
+ * @package plugins
+ * @subpackage polls
  * @author Nicolas Perriault <nperriault@gmail.com>
  */
 class sfPollsComponents extends sfComponents 

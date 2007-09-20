@@ -2,6 +2,8 @@
 /**
  * sfPoll base actions
  * 
+ * @package plugins
+ * @subpackage polls
  * @author Nicolas Perriault <nperriault@gmail.com>
  **/
 class BasesfPollsActions extends sfActions 
@@ -24,8 +26,30 @@ class BasesfPollsActions extends sfActions
   {
     $poll_id = $this->getRequestParameter('id');
     $poll = sfPollPeer::retrieveByPK($poll_id);
-    $this->forward404Unless($poll);
+    $this->forward404Unless($poll, 'Unable to retrieve poll id='.$poll_id);
+    
+    // Here we check if current poll is currently published
+    $this->forward404Unless($poll->getIsPublished() === true, 
+                            'Poll is not currently published');
+    
+    // Here we check if current poll is active for voting
+    if ($poll->getIsActive() === false)
+    {
+      $this->redirect('@sf_propel_polls_results?id='.$poll->getId());
+    }
+    
+    // Here we check if a user has already voted for this poll
+    // If so, we redirect him to the results view
+    $user_id = sfPropelPollsToolkit::getUserPK();
+    $cookie_name = 'poll'.$poll->getId();
+    if (!is_null($this->getRequest()->getCookie($cookie_name)) 
+        or $poll->hasUserVoted($user_id))
+    {
+      $this->redirect('@sf_propel_polls_results?id='.$poll->getId());
+    }
+    
     $this->poll = $poll;
+    $this->user_answer = $poll->getUserAnswer(sfPropelPollsToolkit::getUserPK());
   }
   
   /**
@@ -35,6 +59,7 @@ class BasesfPollsActions extends sfActions
   public function executeList()
   {
     $c = new Criteria();
+    $c->add(sfPollPeer::IS_PUBLISHED, true);
     $c->addDescendingOrderByColumn(sfPollPeer::CREATED_AT);
     $this->polls = sfPollPeer::doSelect($c);
   }
@@ -47,7 +72,8 @@ class BasesfPollsActions extends sfActions
   {
     $poll_id = $this->getRequestParameter('id');
     $poll = sfPollPeer::retrieveByPK($poll_id);
-    $this->forward404Unless($poll);
+    $this->forward404Unless($poll && $poll->getIsPublished(), 
+                            'Unexistant or unpublished poll #'.$poll_id);
     $this->poll = $poll;
   }
 
@@ -60,28 +86,45 @@ class BasesfPollsActions extends sfActions
     $poll_id = $this->getRequestParameter('poll_id');
     $poll = sfPollPeer::retrieveByPK($poll_id);
     $answer_id = $this->getRequestParameter('answer_id');
-    $answer = sfPollAnswerPeer::retrieveByPK($answer_id);
-    $this->forward404Unless($poll && $answer);
     
-    if (sfConfig::get('app_sfPolls_auth_method', 'cookie') === 'cookie')
+    if (is_null($answer_id)) // user has forgotten to check a vote option
     {
-      // Cookie based auth
-      $cookie_name = 'poll_'.$poll->getId();
-      $cookie_value = md5($poll->getId());
-      $cookie_exists = $this->getRequest()->getCookie($cookie_name) === $cookie_value;
-      if (!$cookie_exists && $this->getResponse()->setCookie($cookie_name, $cookie_value, (string)86400*30*12))
-      {
-        $poll->addUserAnswer(null, $answer->getId());
-      }
+      $this->setFlash('notice', 'You must check a vote option');
+      $this->redirect('@sf_propel_polls_detail?id='.$poll->getId());
+    }
+    
+    $answer = sfPollAnswerPeer::retrieveByPK($answer_id);
+    $this->forward404Unless($poll, 'Unable to retrieve poll id='.$poll_id);
+    $this->forward404Unless($answer, 'Unable to retrieve answer id='.$answer_id);
+    
+    // Add vote for current user
+    $user_id = sfPropelPollsToolkit::getUserPK();
+    $cookie_name = 'poll'.$poll->getId();
+    if (!is_null($this->getRequest()->getCookie($cookie_name)) 
+        or $poll->hasUserVoted($user_id))
+    {
+      $this->setFlash('notice', 'You have already voted for this poll');
+      $this->redirect('@sf_propel_polls_detail?id='.$poll->getId());
     }
     else
     {
-      // IP adress auth
-      $poll->addUserAnswer(null, $answer->getId(), $_SERVER['REMOTE_ADDR']);
+      $this->getResponse()->setCookie($cookie_name, $answer->getId());
     }
     
-    $this->setFlash('notice', 'Thanks for your vote');
-    $this->redirect('@sf_propel_polls_results?id='.$poll_id);
+    try
+    {
+      $poll->addVote($answer->getId(), $user_id);
+      $message = 'Thanks for your vote';
+    }
+    catch (Exception $e)
+    {
+      $message = 'Something went wrong, we were unable to store your vote.';
+      sfLogger::getInstance()->err('Polling error: '.$e->getMessage());
+    }
+    
+    // Redirect with message
+    $this->setFlash('notice', $message);
+    $this->redirect('@sf_propel_polls_results?id='.$poll->getId());
   }
 
 }

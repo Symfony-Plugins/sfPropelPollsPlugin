@@ -13,7 +13,7 @@ abstract class BasesfPollAnswerPeer {
 	const CLASS_DEFAULT = 'plugins.sfPropelPollsPlugin.lib.model.sfPollAnswer';
 
 	
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 5;
 
 	
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -35,26 +35,23 @@ abstract class BasesfPollAnswerPeer {
 	const CREATED_AT = 'sf_polls_answers.CREATED_AT';
 
 	
-	const UPDATED_AT = 'sf_polls_answers.UPDATED_AT';
-
-	
 	private static $phpNameMap = null;
 
 
 	
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'PollId', 'Name', 'Votes', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_COLNAME => array (sfPollAnswerPeer::ID, sfPollAnswerPeer::POLL_ID, sfPollAnswerPeer::NAME, sfPollAnswerPeer::VOTES, sfPollAnswerPeer::CREATED_AT, sfPollAnswerPeer::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'poll_id', 'name', 'votes', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'PollId', 'Name', 'Votes', 'CreatedAt', ),
+		BasePeer::TYPE_COLNAME => array (sfPollAnswerPeer::ID, sfPollAnswerPeer::POLL_ID, sfPollAnswerPeer::NAME, sfPollAnswerPeer::VOTES, sfPollAnswerPeer::CREATED_AT, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'poll_id', 'name', 'votes', 'created_at', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PollId' => 1, 'Name' => 2, 'Votes' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (sfPollAnswerPeer::ID => 0, sfPollAnswerPeer::POLL_ID => 1, sfPollAnswerPeer::NAME => 2, sfPollAnswerPeer::VOTES => 3, sfPollAnswerPeer::CREATED_AT => 4, sfPollAnswerPeer::UPDATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'poll_id' => 1, 'name' => 2, 'votes' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PollId' => 1, 'Name' => 2, 'Votes' => 3, 'CreatedAt' => 4, ),
+		BasePeer::TYPE_COLNAME => array (sfPollAnswerPeer::ID => 0, sfPollAnswerPeer::POLL_ID => 1, sfPollAnswerPeer::NAME => 2, sfPollAnswerPeer::VOTES => 3, sfPollAnswerPeer::CREATED_AT => 4, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'poll_id' => 1, 'name' => 2, 'votes' => 3, 'created_at' => 4, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
 	);
 
 	
@@ -117,8 +114,6 @@ abstract class BasesfPollAnswerPeer {
 		$criteria->addSelectColumn(sfPollAnswerPeer::VOTES);
 
 		$criteria->addSelectColumn(sfPollAnswerPeer::CREATED_AT);
-
-		$criteria->addSelectColumn(sfPollAnswerPeer::UPDATED_AT);
 
 	}
 

@@ -25,10 +25,6 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 
 
 	
-	protected $ip_address;
-
-
-	
 	protected $created_at;
 
 	
@@ -36,6 +32,9 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 
 	
 	protected $asfPollAnswer;
+
+	
+	protected $aMember;
 
 	
 	protected $alreadyInSave = false;
@@ -69,13 +68,6 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 	{
 
 		return $this->user_id;
-	}
-
-	
-	public function getIpAddress()
-	{
-
-		return $this->ip_address;
 	}
 
 	
@@ -163,18 +155,8 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 			$this->modifiedColumns[] = sfPollUserAnswerPeer::USER_ID;
 		}
 
-	} 
-	
-	public function setIpAddress($v)
-	{
-
-						if ($v !== null && !is_string($v)) {
-			$v = (string) $v; 
-		}
-
-		if ($this->ip_address !== $v) {
-			$this->ip_address = $v;
-			$this->modifiedColumns[] = sfPollUserAnswerPeer::IP_ADDRESS;
+		if ($this->aMember !== null && $this->aMember->getId() !== $v) {
+			$this->aMember = null;
 		}
 
 	} 
@@ -208,15 +190,13 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 
 			$this->user_id = $rs->getInt($startcol + 3);
 
-			$this->ip_address = $rs->getString($startcol + 4);
-
-			$this->created_at = $rs->getTimestamp($startcol + 5, null);
+			$this->created_at = $rs->getTimestamp($startcol + 4, null);
 
 			$this->resetModified();
 
 			$this->setNew(false);
 
-						return $startcol + 6; 
+						return $startcol + 5; 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating sfPollUserAnswer object", $e);
 		}
@@ -326,6 +306,13 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 				$this->setsfPollAnswer($this->asfPollAnswer);
 			}
 
+			if ($this->aMember !== null) {
+				if ($this->aMember->isModified()) {
+					$affectedRows += $this->aMember->save($con);
+				}
+				$this->setMember($this->aMember);
+			}
+
 
 						if ($this->isModified()) {
 				if ($this->isNew()) {
@@ -387,6 +374,12 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 				}
 			}
 
+			if ($this->aMember !== null) {
+				if (!$this->aMember->validate($columns)) {
+					$failureMap = array_merge($failureMap, $this->aMember->getValidationFailures());
+				}
+			}
+
 
 			if (($retval = sfPollUserAnswerPeer::doValidate($this, $columns)) !== true) {
 				$failureMap = array_merge($failureMap, $retval);
@@ -424,9 +417,6 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 				return $this->getUserId();
 				break;
 			case 4:
-				return $this->getIpAddress();
-				break;
-			case 5:
 				return $this->getCreatedAt();
 				break;
 			default:
@@ -443,8 +433,7 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 			$keys[1] => $this->getPollId(),
 			$keys[2] => $this->getAnswerId(),
 			$keys[3] => $this->getUserId(),
-			$keys[4] => $this->getIpAddress(),
-			$keys[5] => $this->getCreatedAt(),
+			$keys[4] => $this->getCreatedAt(),
 		);
 		return $result;
 	}
@@ -473,9 +462,6 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 				$this->setUserId($value);
 				break;
 			case 4:
-				$this->setIpAddress($value);
-				break;
-			case 5:
 				$this->setCreatedAt($value);
 				break;
 		} 	}
@@ -489,8 +475,7 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[1], $arr)) $this->setPollId($arr[$keys[1]]);
 		if (array_key_exists($keys[2], $arr)) $this->setAnswerId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setUserId($arr[$keys[3]]);
-		if (array_key_exists($keys[4], $arr)) $this->setIpAddress($arr[$keys[4]]);
-		if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
 	}
 
 	
@@ -502,7 +487,6 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(sfPollUserAnswerPeer::POLL_ID)) $criteria->add(sfPollUserAnswerPeer::POLL_ID, $this->poll_id);
 		if ($this->isColumnModified(sfPollUserAnswerPeer::ANSWER_ID)) $criteria->add(sfPollUserAnswerPeer::ANSWER_ID, $this->answer_id);
 		if ($this->isColumnModified(sfPollUserAnswerPeer::USER_ID)) $criteria->add(sfPollUserAnswerPeer::USER_ID, $this->user_id);
-		if ($this->isColumnModified(sfPollUserAnswerPeer::IP_ADDRESS)) $criteria->add(sfPollUserAnswerPeer::IP_ADDRESS, $this->ip_address);
 		if ($this->isColumnModified(sfPollUserAnswerPeer::CREATED_AT)) $criteria->add(sfPollUserAnswerPeer::CREATED_AT, $this->created_at);
 
 		return $criteria;
@@ -539,8 +523,6 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 		$copyObj->setAnswerId($this->answer_id);
 
 		$copyObj->setUserId($this->user_id);
-
-		$copyObj->setIpAddress($this->ip_address);
 
 		$copyObj->setCreatedAt($this->created_at);
 
@@ -626,6 +608,36 @@ abstract class BasesfPollUserAnswer extends BaseObject  implements Persistent {
 			
 		}
 		return $this->asfPollAnswer;
+	}
+
+	
+	public function setMember($v)
+	{
+
+
+		if ($v === null) {
+			$this->setUserId(NULL);
+		} else {
+			$this->setUserId($v->getId());
+		}
+
+
+		$this->aMember = $v;
+	}
+
+
+	
+	public function getMember($con = null)
+	{
+				include_once 'lib/model/om/BaseMemberPeer.php';
+
+		if ($this->aMember === null && ($this->user_id !== null)) {
+
+			$this->aMember = MemberPeer::retrieveByPK($this->user_id, $con);
+
+			
+		}
+		return $this->aMember;
 	}
 
 

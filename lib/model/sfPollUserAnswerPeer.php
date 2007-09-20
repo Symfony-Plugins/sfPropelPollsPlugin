@@ -9,34 +9,26 @@ class sfPollUserAnswerPeer extends BasesfPollUserAnswerPeer
 
   /**
    * Get or create a new sfPollUserAnswer regarding a poll id and a user PK
-   * or an IP Address
    *
-   * @param  int     $poll_id
-   * @param  int     $user_id
-   * @param  string  IP address (optional)
+   * @param  int     $poll_id  Poll PK
+   * @param  int     $user_id  User PK
    * @return sfPollUserAnswer
    **/
-  public static function getOrCreate($poll_id, $user_id, $ip_address=NULL)
+  public static function getOrCreate($poll_id, $user_id)
   {
-    $c = new Criteria();
-    
     if (!is_int($poll_id) or $poll_id == 0)
     {
       throw new PropelException('A poll id must be provided');
     }
-    else
+    
+    if (!is_int($user_id) or $user_id == 0)
     {
-      $c->add(self::POLL_ID, $poll_id);
+      throw new PropelException('A user id must be provided');
     }
-
-    if ($ip_address && preg_match('/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/', $ip_address))
-    {
-      $c->add(self::IP_ADDRESS, $ip_address);
-    }
-    else
-    {
-      $c->add(self::USER_ID, $user_id);
-    }
+    
+    $c = new Criteria();
+    $c->add(self::POLL_ID, $poll_id);
+    $c->add(self::USER_ID, $user_id);
     $a = self::doSelectOne($c);
     return is_null($a) ? new sfPollUserAnswer() : $a;
   }
