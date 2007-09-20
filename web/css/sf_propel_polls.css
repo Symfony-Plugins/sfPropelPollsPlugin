@@ -1,0 +1,6 @@
+.sf_poll_results strong { 
+   display: block; 
+   _height: 1%; 
+   border-left: 0px solid blue; 
+   padding-left: 3px; 
+}

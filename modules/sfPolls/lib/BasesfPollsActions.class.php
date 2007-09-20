@@ -75,6 +75,9 @@ class BasesfPollsActions extends sfActions
     $this->forward404Unless($poll && $poll->getIsPublished(), 
                             'Unexistant or unpublished poll #'.$poll_id);
     $this->poll = $poll;
+    $this->poll_results = $poll->getResults();
+    
+    $this->getResponse()->addStylesheet('/sfPropelPollsPlugin/css/sf_propel_polls');
   }
 
   /**
@@ -108,7 +111,9 @@ class BasesfPollsActions extends sfActions
     }
     else
     {
-      $this->getResponse()->setCookie($cookie_name, $answer->getId());
+      // Cookie expires in 10 years (yeah, ten)
+      $cookie_expires = date('Y-m-d H:i:s', time() + (86400 * 365 * 10));
+      $this->getResponse()->setCookie($cookie_name, $answer->getId(), $cookie_expires);
     }
     
     try

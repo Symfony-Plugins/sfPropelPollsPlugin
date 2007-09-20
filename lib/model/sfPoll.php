@@ -167,6 +167,7 @@ class sfPoll extends BasesfPoll
     {
       $votes = $answer->getVotes();
       $percent = $total > 0 ? $votes * 100 / $total : 0;
+      $percent = round($percent, sfConfig::get('app_sfPolls_percent_precision', 2));
       $results[$answer->getId()] = array('name'    => $answer->getName(),
                                          'count'   => $votes,
                                          'percent' => $percent);

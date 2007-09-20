@@ -32,6 +32,10 @@ config/sfPropelPollsPlugin.yml:
     prefix: sf_propel_polls_
 }}}
 
+ Of course, il you already have a {{{config_handlers.yml}}} file in your 
+ {{{config/}}} directory, you have to append the previously mentionned content to 
+ the existing one.
+
 This last step '''is not required if you use symfony 1.1'''.
 
 Then, rebuild your model :
