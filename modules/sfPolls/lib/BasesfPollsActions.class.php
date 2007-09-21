@@ -65,6 +65,21 @@ class BasesfPollsActions extends sfActions
   }
   
   /**
+   * This method is executed before every action. Here we load the I18N helper
+   * if it is not enabled in settings.yml. 
+   * 
+   */
+  public function preExecute()
+  {
+    $loaded_helpers = sfConfig::get('sf_standard_helpers', array());
+    if (!in_array('I18N', $loaded_helpers))
+    {
+      sfLoader::loadHelpers('I18N');
+    }
+    return parent::preExecute();
+  }
+  
+  /**
    * Poll results
    * 
    **/

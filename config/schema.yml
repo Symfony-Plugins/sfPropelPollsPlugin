@@ -24,6 +24,6 @@
     _attributes:   { phpName: sfPollUserAnswer, package: plugins.sfPropelPollsPlugin.lib.model }
     id:
     poll_id:       { type: integer, foreignTable: <?php echo $config['polls_table'] ?>, foreignReference: id, onDelete: cascade }
-    answer_id:     { type: integer, foreignTable: <?php echo $config['polls_answers_table'] ?>, foreignReference: id, onDelete: cascade }
+    answer_id:     { type: integer, foreignTable: <?php echo $config['polls_answers_table'] ?>, foreignReference: id }
     user_id:       { type: integer, foreignTable: <?php echo $config['user_table'] ?>, foreignReference: <?php echo $config['user_id'] ?>, onDelete: cascade }
     created_at:

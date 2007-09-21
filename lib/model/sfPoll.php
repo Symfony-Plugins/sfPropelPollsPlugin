@@ -116,7 +116,7 @@ class sfPoll extends BasesfPoll
     $answers = $this->getAnswers();
     if (is_null($answers) or count($answers) === 0)
     {
-      throw new sfPropelPollsException('This poll has no answers');
+      return 0;
     }
     $count_votes = 0;
     foreach ($answers as $answer)

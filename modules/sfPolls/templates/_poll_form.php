@@ -7,7 +7,7 @@
   <?php endif; ?>
   <?php echo form_remote_tag(array('url'    => '@sf_propel_polls_vote',
                                    'update' => 'cmp_poll_'.$poll->getId())) ?>
-    <?php include_partial('sfPolls/poll_form_elements', array('poll'   => $poll)) ?>
+    <?php include_partial('sfPolls/poll_form_elements', array('poll' => $poll)) ?>
   </form>
 </div>
 <?php endif; ?>

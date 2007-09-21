@@ -21,7 +21,7 @@
     </p>
   <?php endforeach; ?>
   <p>
-    <?php echo submit_tag('Vote !') ?>
+    <?php echo submit_tag(__('Vote')) ?>
     <?php echo link_to('View results', 
                        '@sf_propel_polls_results?id='.$poll->getId()) ?>
   </p>

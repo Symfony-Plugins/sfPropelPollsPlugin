@@ -3,6 +3,9 @@
 <?php if ($poll->getDescription()): ?>
   <?php echo simple_format_text($poll->getDescription()) ?>
 <?php endif; ?>
+<?php if ($poll->getIsActive() !== true): ?>
+  <p><?php echo __('Votes for this poll are closed') ?>.</p>
+<?php endif; ?>
 <?php if (isset($poll_results) && count($poll_results) > 0): ?>
 <ol class="sf_poll_results">
 <?php foreach ($poll_results as $answer_id => $answer_result): ?>
@@ -13,5 +16,5 @@
 <?php endforeach; ?>
 </ol>
 <?php else: ?>
-<p>This poll has no available answers to show the results for.</p>
+<p><?php echo __('This poll has no available answers to show the results for')?>.</p>
 <?php endif; ?>

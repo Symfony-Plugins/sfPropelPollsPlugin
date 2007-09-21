@@ -16,7 +16,7 @@ $user_answer_id = $user_answer ? $user_answer->getAnswerId() : NULL;
   </p>
 <?php endforeach; ?>
 <p>
-  <?php echo submit_tag('Vote !') ?>
+  <?php echo submit_tag(__('Vote')) ?>
   <?php echo link_to('View results', 
                      '@sf_propel_polls_results?id='.$poll->getId()) ?>
 </p>

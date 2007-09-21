@@ -9,11 +9,17 @@ generator:
       is_published:       { name: Published, help: Is this poll available? }
       is_active:          { name: Active, help: Is this poll open for voting? }
       admin_answers:      { name: Available answers }
+      results:            { name: Current results }
         
     list:
       title:              List of polls
       display:            [ created_at, =title, count_votes, is_active, is_published ]
-      
+      object_actions:
+        _edit:            ~
+        _delete:          ~
+      actions:
+        _create:          ~
+    
     edit:
       title:              Editing %%title%% poll
-      display:            [ title, description, _admin_answers, is_published, is_active ]
+      display:            [ title, description, _admin_answers, _results, is_published, is_active ]

@@ -1,5 +1,5 @@
 <?php use_helper('Text') ?>
-<h2>Polls list</h2>
+<h2><?php echo __('Polls list') ?></h2>
 <?php if (isset($polls) && count($polls) > 0): ?>
 <dl id="polls_list">
   <?php foreach ($polls as $poll): ?>

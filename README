@@ -151,3 +151,23 @@ This will display the polling form of the sfPoll object with PK=1.
 The plugin is unit tested, test suite is located in the 
 {{{./test/sfPropelPollsTest.php}}} file.
 
+== Uninstallation ==
+
+{{{
+symfony plugin-uninstall symfony/sfPropelPollsPlugin
+}}}
+
+== TODO ==
+
+ * Manage i18n
+
+== Changelog ==
+
+=== 2006-09-21 | v0.6.0 ===
+
+ * Added cookie management in voting module
+ * Modified schema and model, you need to rebuild-all and cc
+
+=== 2006-09-05 | v0.5.0 ===
+ 
+ * Initial release
