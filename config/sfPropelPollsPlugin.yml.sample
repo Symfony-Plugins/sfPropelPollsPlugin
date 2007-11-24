@@ -1,6 +1,6 @@
 schema:
   connection:                propel
-  user_table:                sf_guard_users
+  user_table:                sf_guard_user
   user_id:                   id
   user_class:                sfGuardUser
   polls_table:               sf_polls

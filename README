@@ -115,10 +115,10 @@ In back office, you should activate the sfPollsAdmin module :
 
 Front office routes url are provided by default, here they are:
 
- * {{{polls}}}: lists all published polls
- * {{{poll_detail?id=id}}}: shows poll form
- * {{{poll_results?id=id}}}: shows poll results
- * {{{poll_vote}}}: handle voting request
+ * {{{@polls}}}: lists all published polls
+ * {{{@poll_detail?id=id}}}: shows poll form
+ * {{{@poll_results?id=id}}}: shows poll results
+ * {{{@poll_vote}}}: handle voting request
  
 If you wish to deactivate these routes, you can set this setting in the 
 {{{app.yml}}} of your app:
