@@ -1,4 +1,4 @@
-<?php use_helper('Text', 'Poll') ?>
+<?php use_helper('Text', 'Poll', 'I18N') ?>
 <h3><?php echo $poll->getTitle() ?></h3>
 <?php if ($poll->getDescription()): ?>
   <?php echo simple_format_text($poll->getDescription()) ?>

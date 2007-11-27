@@ -1,4 +1,4 @@
-<?php use_helper('Text') ?>
+<?php use_helper('Text', 'I18N') ?>
 <h2><?php echo __('Polls list') ?></h2>
 <?php if (isset($polls) && count($polls) > 0): ?>
 <dl id="polls_list">

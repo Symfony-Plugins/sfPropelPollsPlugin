@@ -1,4 +1,4 @@
-<?php use_helper('Text', 'Javascript') ?>
+<?php use_helper('Text', 'Javascript', 'I18N') ?>
 <?php if (isset($poll)): ?>
 <div id="cmp_poll_<?php echo $poll->getId() ?>">
   <h2><?php echo $poll->getTitle() ?></h2>

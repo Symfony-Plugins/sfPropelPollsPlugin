@@ -1,3 +1,4 @@
+<?php use_helper('I18N') ?>
 <?php echo input_hidden_tag('poll_id', $poll->getId()) ?>
 <?php
 $user_answer = $poll->getUserAnswer($user_id);

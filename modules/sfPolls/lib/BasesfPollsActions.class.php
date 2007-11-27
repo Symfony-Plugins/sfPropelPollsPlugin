@@ -91,8 +91,6 @@ class BasesfPollsActions extends sfActions
                             'Unexistant or unpublished poll #'.$poll_id);
     $this->poll = $poll;
     $this->poll_results = $poll->getResults();
-    
-    $this->getResponse()->addStylesheet('/sfPropelPollsPlugin/css/sf_propel_polls');
   }
 
   /**
@@ -107,7 +105,7 @@ class BasesfPollsActions extends sfActions
     
     if (is_null($answer_id)) // user has forgotten to check a vote option
     {
-      $this->setFlash('notice', 'You must check a vote option');
+      $this->setFlash('notice', sfContext::getInstance()->getI18N()->__('You must check a vote option'));
       $this->redirect('@sf_propel_polls_detail?id='.$poll->getId());
     }
     
@@ -121,7 +119,7 @@ class BasesfPollsActions extends sfActions
     if (!is_null($this->getRequest()->getCookie($cookie_name)) 
         or $poll->hasUserVoted($user_id))
     {
-      $this->setFlash('notice', 'You have already voted for this poll');
+      $this->setFlash('notice', sfContext::getInstance()->getI18N()->__('You have already voted for this poll'));
       $this->redirect('@sf_propel_polls_detail?id='.$poll->getId());
     }
     else
@@ -134,11 +132,11 @@ class BasesfPollsActions extends sfActions
     try
     {
       $poll->addVote($answer->getId(), $user_id);
-      $message = 'Thanks for your vote';
+      $message = sfContext::getInstance()->getI18N()->__('Thanks for your vote');
     }
     catch (Exception $e)
     {
-      $message = 'Something went wrong, we were unable to store your vote.';
+      $message = sfContext::getInstance()->getI18N()->__('Something went wrong, we were unable to store your vote.');
       sfLogger::getInstance()->err('Polling error: '.$e->getMessage());
     }
     
