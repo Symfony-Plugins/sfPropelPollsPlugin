@@ -6,7 +6,16 @@
  */
 class sfPoll extends BasesfPoll
 {
-
+  /**
+   * Add a sfPollAnswer object related to current sfPoll object instance
+   *
+   * @return String
+   **/
+  public function __toString()
+  {
+    return $this->getTitle();
+  }
+  
   /**
    * Add a sfPollAnswer object related to current sfPoll object instance
    *
