@@ -9,10 +9,10 @@
   <?php if (count($answers) == 0): ?>
     <p><?php echo __('No answer for this poll yet') ?>.</p>
   <?php endif; ?>
-  <?php echo button_to_remote('Add a possible answer to this poll',
+  <?php echo button_to_remote(__('Add a possible answer to this poll'),
              array('url'      => 'sfPollsAdmin/addAnswer?poll_id='.
                                  $sf_poll->getId(),
-                   'with'     => "'answer_text=' + escape(prompt('Enter answer text'))",
+                   'with'     => "'answer_text=' + escape(prompt('".__('Enter answer text')."'))",
                    'update'   => 'answers',
                    'position' => 'bottom',
                    'complete' => visual_effect('highlight', 'answers'))) ?>
