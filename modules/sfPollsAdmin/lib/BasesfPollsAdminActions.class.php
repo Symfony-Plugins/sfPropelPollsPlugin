@@ -49,7 +49,7 @@ class BasesfPollsAdminActions extends autosfPollsAdminActions
     $answer_id = $this->getRequestParameter('answer_id');
     $answer_text = $this->getRequestParameter('answer_text');
     $answer = sfPollAnswerPeer::retrieveByPK($answer_id);
-    if (!is_null($answer_text) && trim($answer_text) != '')
+    if (!is_null($answer_text) && trim($answer_text) != '' && 'null' != $answer_text)
     {
       $answer->setName(trim($answer_text));
       $answer->save();
