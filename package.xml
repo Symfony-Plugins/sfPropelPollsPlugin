@@ -10,9 +10,9 @@
     <email>nperriault@gmail.com</email>
     <active>yes</active>
   </lead>
-  <date>2008-08-28</date>
+  <date>2008-08-30</date>
   <version>
-    <release>0.6.2</release>
+    <release>0.6.3</release>
     <api>0.6.0</api>
   </version>
   <stability>
@@ -84,6 +84,9 @@
             <file name="generator.yml" role="data"/>
             <file name="view.yml" role="data"/>
           </dir>
+          <dir name="lib">
+            <file name="BasesfPollsAdminActions.class.php" role="data"/>
+          </dir>
           <dir name="templates">
             <file name="_admin_answers.php" role="data"/>
             <file name="_li_answer.php" role="data"/>
@@ -126,6 +129,22 @@
   <phprelease>
  </phprelease>
   <changelog>
+    <release>
+      <version>
+        <release>0.6.3</release>
+        <api>0.6.0</api>
+      </version>
+      <stability>
+        <release>beta</release>
+        <api>beta</api>
+      </stability>
+      <license uri="http://www.symfony-project.com/license">MIT license</license>
+      <date>2008-08-30</date>
+      <license>MIT</license>
+      <notes>
+        * Fixed package.xml to include BasesfPollsAdminActions.class.php
+      </notes>
+    </release>
     <release>
       <version>
         <release>0.6.2</release>
